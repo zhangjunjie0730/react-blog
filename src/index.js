@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import 'antd/dist/antd.css';
-import 'antd/dist/antd.less';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// redux
 import store from './store';
 import { Provider } from 'react-redux';
+
+// styles
+import 'styles/index.less';
+import 'antd/dist/antd.less';
 
 ReactDOM.render(
   <React.StrictMode>

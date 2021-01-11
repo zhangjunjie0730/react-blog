@@ -15,6 +15,7 @@ function AppHeader() {
           <Title />
         </Col>
         <Col {...responsiveNav}>
+          {/* 右侧搜索框 navbar */}
           <div className="header-right">
             <div id="search-box">
               <SearchInput />

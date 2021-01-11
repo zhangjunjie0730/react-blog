@@ -1,3 +1,5 @@
+import { GithubOutlined } from '@ant-design/icons';
+
 // 后台API接口地址
 export const API_BASE_URL = 'http://127.0.0.1:3002';
 
@@ -6,11 +8,11 @@ export const BLOG_NAME = 'codelife';
 
 // 侧边栏信息
 export const SIDEBAR = {
-  // avatar: require('https://avatars3.githubusercontent.com/u/68802498?s=400&u=1217043eb3b69df1b520fbe7dc274a71fe5d775b&v=4'),
+  avatar: require('assets/images/avatar.jpeg'),
   title: 'zhangjunjie',
   subTitle: '早睡早起',
   homepages: {
-    github: 'https://github.com/zhangjunjie0730',
+    github: { link: 'https://github.com/zhangjunjie0730', icon: <GithubOutlined /> },
   },
 };
 

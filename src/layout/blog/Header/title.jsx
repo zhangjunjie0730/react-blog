@@ -38,7 +38,7 @@ function Title() {
         overlay={MobileMenu}
         getPopupContainer={() => document.querySelector('.app-header .header-left')}
       >
-        <MenuOutlined />
+        <MenuOutlined className="header-dropdown-icon" />
       </Dropdown>
     </div>
   );

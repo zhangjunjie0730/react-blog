@@ -25,6 +25,7 @@ route(server);
 server.listen(PORT, () => {
   db.sequelize.sync({ force: false }).then(() => {
     console.log(`sequelize connect success`);
+    console.log('当前环境：', process.env.NODE_ENV);
     console.log(`sevice listen on http://127.0.0.1:${PORT}`);
   });
 });

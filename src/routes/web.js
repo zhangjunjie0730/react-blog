@@ -1,11 +1,11 @@
-import { GITHUB_AUTH } from 'config';
+import { GITHUB } from 'config';
 import Layout from 'layout/blog';
 
 const webRoutes = {
   path: '/',
   name: 'home',
   component: Layout,
-  childRoutes: [],
+  childRoutes: [{ path: '', component: import('pages/Home') }],
 };
 
 export default webRoutes;

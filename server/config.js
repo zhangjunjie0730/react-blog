@@ -16,7 +16,7 @@ const config = {
   DATABASE: {
     database: 'react_blog',
     user: 'root',
-    password: 'root',
+    password: 'zjj970730',
     options: {
       host: 'localhost', // 连接的 host 地址
       port: 3306,
