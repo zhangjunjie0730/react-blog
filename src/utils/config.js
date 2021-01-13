@@ -11,3 +11,8 @@ export const COLOR_LIST = [
   'geekblue',
   'purple',
 ];
+
+// pageSize
+export const HOME_PAGESIZE = 10;
+export const TIMELINE_PAGESIZE = 15; // timeline pageSize
+export const TAG_PAGESIZE = 15; // tag / category pageSize

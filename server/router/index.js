@@ -3,7 +3,7 @@ const fs = require('fs');
 module.exports = server => {
   fs.readdirSync(__dirname).forEach(file => {
     if (file === 'index.js') return;
-    const router = require(`./${file}`);
-    server.use(router.routes());
+    const route = require(`./${file}`);
+    server.use(route.routes());
   });
 };

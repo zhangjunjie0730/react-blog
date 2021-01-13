@@ -1,24 +1,26 @@
 const Router = require('koa-router');
 const router = new Router({ prefix: '/article' });
+const {
+  getArticleById,
+  delete: del,
+  create,
+  getArticleList,
+  update,
+  delList,
+} = require('../controllers/article');
 
 router
-  .get('/list', async ctx => {
-    ctx.body = '文章列表如下';
-  })
+  .get('/list', getArticleList)
   .get('/output/all', async ctx => {
     ctx.body = '导出所有文章';
   })
   .get('/output/:id', async ctx => {
     ctx.body = '导出指定文章';
   })
-  .get('/:id', async ctx => {
-    ctx.body = '获取指定文章';
-  });
+  .get('/:id', getArticleById);
 
 router
-  .post('/', async ctx => {
-    ctx.body = '添加文章成功';
-  })
+  .post('/', create)
   .post('/upload', async ctx => {
     ctx.body = '上传文章';
   })
@@ -29,16 +31,8 @@ router
     ctx.body = '确实上传';
   });
 
-router.put('/:id', async ctx => {
-  ctx.body = '修改置顶文章';
-});
+router.put('/:id', update);
 
-router
-  .delete('/:id', async ctx => {
-    ctx.body = '删除指定文章';
-  })
-  .delete('/list/:list', async ctx => {
-    ctx.body = '删除指定文章列表';
-  });
+router.delete('/:id', del).delete('/list/:list', delList);
 
 module.exports = router;

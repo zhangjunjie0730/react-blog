@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const cors = require('koa2-cors');
-// const path = require('path');
 
 const route = require('./router');
 const { PORT } = require('./config');
@@ -8,6 +7,12 @@ const db = require('./database');
 const koaBody = require('koa-body');
 
 const server = new Koa();
+
+// 为server的参数context绑定自定义的属性
+const context = require('./utils/context');
+Object.keys(context).forEach(key => {
+  server.context[key] = context[key];
+});
 
 server.use(cors()).use(
   koaBody({
