@@ -4,6 +4,6 @@ module.exports = server => {
   fs.readdirSync(__dirname).forEach(file => {
     if (file === 'index.js') return;
     const route = require(`./${file}`);
-    server.use(route.routes());
+    server.use(route.routes()).use(route.allowedMethods());
   });
 };

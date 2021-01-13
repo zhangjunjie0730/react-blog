@@ -7,6 +7,9 @@ const {
   getArticleList,
   update,
   delList,
+  checkExist,
+  upload,
+  uploadConfirm,
 } = require('../controllers/article');
 
 router
@@ -21,15 +24,9 @@ router
 
 router
   .post('/', create)
-  .post('/upload', async ctx => {
-    ctx.body = '上传文章';
-  })
-  .post('/checkExist', async ctx => {
-    ctx.body = '检查是否存在该文章';
-  })
-  .post('/upload/confirm', async ctx => {
-    ctx.body = '确实上传';
-  });
+  .post('/upload', upload)
+  .post('/checkExist', checkExist)
+  .post('/upload/confirm', uploadConfirm);
 
 router.put('/:id', update);
 

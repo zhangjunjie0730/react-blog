@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { resolve } = require('path');
 const path = require('path');
 
 const uploadPath = path.resolve(__dirname, '../upload');
@@ -99,7 +98,7 @@ function getContentFromMdFile(filePath) {
 }
 
 /**
- * createArticleInfo 根据database信息创建信息（导出文件时放入YAML Front Matter）
+ * createArticleInfo 根据database信息创建信息（导出文件时放入YAML Front Matter）,然后再加上content内容！
  * @param {Object} {title, content, createdAt, categories, tags}
  * @result {String} 处理好的字符串
  */
@@ -132,6 +131,8 @@ function createArticleInfo({ title, content, createdAt, categories, tags }) {
     `date: ${createdAt}`,
     `categories: ${_generateTagOrCate(categories)}`,
     `tags: ${_generateTagOrCate(tags)}`,
+    `---\n`,
+    content,
   ];
   return prefixInfo.join('\n');
 }

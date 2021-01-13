@@ -1,5 +1,7 @@
 const Joi = require('joi');
 const fs = require('fs');
+const path = require('path');
+const { send } = require('koa-send');
 const Sequelize = require('sequelize');
 const { or, not, like } = Sequelize.Op;
 const {
@@ -11,6 +13,15 @@ const {
   user: UserModel,
   sequelize,
 } = require('../database');
+
+// article <=> md.File 方法
+const {
+  findOrCreateFileSavePath,
+  uploadPath,
+  outputPath,
+  getContentFromMdFile,
+  getMdFileFromArticle,
+} = require('../utils/file');
 
 class ArticleController {
   // 初始化about页面
@@ -234,8 +245,12 @@ class ArticleController {
     }
   }
 
-  // 查看文件名是否在文章数据库中存在
-  static async isExistArticle(ctx) {
+  /**
+   * 查看文件名是否在文章数据库中存在
+   * 存在：返回数据库中这个文章的信息
+   * 不存在：解析md文件，存入数据库
+   */
+  static async checkExist(ctx) {
     const validator = ctx.validate(ctx.request.body, {
       fileNameList: Joi.array().required(),
     });
@@ -244,8 +259,108 @@ class ArticleController {
       const list = await Promise.all(
         fileNameList.map(async fileName => {
           const filePath = `${uploadPath}/${fileName}`;
+          const file = getMdFileFromArticle(filePath);
+          const title = file.title || fileName.replace(/\.md/, '');
+          const article = await ArticleModel.findOne({ where: { title }, attributes: ['id'] });
+          const result = { fileName, title };
+          if (article) {
+            result.exist = true;
+            result.articleId = article.id;
+          }
         })
       );
+      ctx.body = list;
+    }
+  }
+
+  // upload 上传文章
+  static async upload(ctx) {
+    const file = ctx.request.files.file;
+    await findOrCreateFileSavePath(uploadPath);
+
+    const upload = file => {
+      const reader = fs.createReadStream(file.path); // 创建可读流
+      const fileName = file.name;
+      const filePath = path.join(uploadPath, fileName);
+      const upStream = fs.createWriteStream(filePath);
+      reader.pipe(upStream);
+      reader.on('end', () => console.log('上传成功！'));
+    };
+    Array.isArray(file) ? file.forEach(item => upload(item)) : upload(file);
+    ctx.body = '上传成功';
+  }
+
+  // uploadConfirm 确认上传：读取文章并插入到数据库
+  static async uploadConfirm(ctx) {
+    const validator = ctx.validate(ctx.request.body, {
+      authorId: Joi.number(),
+      uploadList: Joi.array(),
+    });
+    if (validator) {
+      const { uploadList, authorId } = ctx.request.body;
+      await findOrCreateFileSavePath(uploadPath);
+
+      const _parseList = list => {
+        return list.map(item => {
+          const filePath = path.join(uploadPath, item.fileName);
+          const result = getContentFromMdFile(filePath);
+          const { title, date, categories = [], tags = [], content } = result;
+          const data = {
+            title: title || item.fileName.replace(/\.md/, ''),
+            categories: categories.map(c => ({ name: c })),
+            tags: tags.map(t => ({ name: t })),
+            content,
+            authorId,
+          };
+          if (date) data.createAt = date;
+          if (item.articleId) data.articleId = item.articleId;
+          return data;
+        });
+      };
+
+      const list = _parseList(uploadList);
+      const updateList = list.filter(d => !!d.articleId);
+      const insertList = list.filter(d => !d.articleId);
+
+      // 将文章插入数据库
+      const insertResultList = await Promise.all(
+        insertList.map(data => ArticleModel.create(data, { include: [TagModel, CategoryModel] }))
+      );
+
+      const updateResultList = await Promise.all(
+        updateList.map(async data => {
+          const { title, content, categories = [], tags = [], articleId } = data;
+          await ArticleModel.update({ title, content }, { where: { id: articleId } });
+          await TagModel.destroy({ where: { articleId } });
+          await TagModel.bulkCreate(tags);
+          await CategoryModel.destroy({ where: { articleId } });
+          await CategoryModel.bulkCreate(categories);
+          return ArticleModel.findOne({ where: { id: articleId } });
+        })
+      );
+
+      ctx.body = { message: 'success', insertList: insertResultList, updateList: updateResultList };
+    }
+  }
+
+  // 导出文章
+  static async output(ctx) {
+    const validator = ctx.validate(ctx.params, {
+      id: Joi.number().required(),
+    });
+    if (validator) {
+      const article = await ArticleModel.findOne({
+        where: { id: ctx.params.id },
+        include: [
+          // 查找 分类和标签
+          { model: TagModel, attributes: ['name'] },
+          { model: CategoryModel, attributes: ['name'] },
+        ],
+      });
+
+      const { fileName } = await getMdFileFromArticle(article);
+      ctx.attachment(decodeURI(fileName));
+      await send(ctx, fileName, { root: outputPath });
     }
   }
 }
