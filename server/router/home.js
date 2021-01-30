@@ -1,18 +1,15 @@
 const Router = require('koa-router');
 const router = new Router();
+const { login } = require('../controllers/user');
+
+const { getTagList, getCategoryList } = require('../controllers/tag');
 
 // 获取tag和categories列表
-router.get('/tag/list', async ctx => {
-  ctx.body = '/tag/list';
-});
-router.get('/category/list', async ctx => {
-  ctx.body = '/category/list';
-});
+router.get('/tag/list', getTagList);
+router.get('/category/list', getCategoryList);
 
 // 用户login和register
-router.post('/login', async ctx => {
-  ctx.body = '登陆成功';
-});
+router.post('/login', login);
 router.post('/register', async ctx => {
   ctx.body = '注册成功';
 });

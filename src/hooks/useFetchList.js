@@ -72,7 +72,7 @@ const useFetchList = ({
   const handlePageChange = useCallback(
     page => {
       const search = location.search.includes('page=')
-        ? location.search.replace(/（page=)(\d+)/, `$1${page}`)
+        ? location.search.replace(/(page=)(\d+)/, `$1${page}`)
         : `?page=${page}`;
       const jumpUrl = location.pathname + search;
       history.push(jumpUrl);

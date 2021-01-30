@@ -1,4 +1,4 @@
-import webRoutes from './web';
+import webRoutes from './client';
 
 const routes = [webRoutes];
 

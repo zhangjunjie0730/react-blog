@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 // redux
 import store from './store';
 import { Provider } from 'react-redux';
+import { Provider as BusProvider } from 'hooks/useBus';
 
 // styles
 import 'styles/index.less';
@@ -13,9 +14,11 @@ import 'antd/dist/antd.less';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <BusProvider>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BusProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

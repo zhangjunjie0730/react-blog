@@ -42,6 +42,7 @@ exports.checkToken = (ctx, roleList = []) => {
         }
       }
     } else {
+      // token存在请求参数中
       const { token } = ctx.query;
       if (token) {
         const _token = token.split(' ')[1];

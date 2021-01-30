@@ -6,15 +6,15 @@ const { PORT } = require('./config');
 const db = require('./database');
 const koaBody = require('koa-body');
 
-const server = new Koa();
+const app = new Koa();
 
-// 为server的参数context绑定自定义的属性
+// 为app的参数context绑定自定义的属性
 const context = require('./utils/context');
 Object.keys(context).forEach(key => {
-  server.context[key] = context[key];
+  app.context[key] = context[key];
 });
 
-server.use(cors()).use(
+app.use(cors()).use(
   koaBody({
     multipart: true, // 支持文件上传
     formidable: {
@@ -25,9 +25,9 @@ server.use(cors()).use(
   })
 );
 
-route(server);
+route(app);
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   db.sequelize.sync({ force: false }).then(() => {
     console.log(`sequelize connect success`);
     console.log('当前环境：', process.env.NODE_ENV);

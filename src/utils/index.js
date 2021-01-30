@@ -1,5 +1,18 @@
+import marked from 'marked';
+import xss from 'xss';
 import { COLOR_LIST } from './config';
 import { getLocalStorage } from './localStorage';
+
+// 获取 url query 参数
+export const decodeQuery = url => {
+  const params = {};
+  const paramsStr = url.replace(/\.*\?/, ''); // a=1&b=2&c=&d=xxx&e
+  paramsStr.split('&').forEach(v => {
+    const d = v.split('=');
+    if (d[1] && d[0]) params[d[0]] = d[1];
+  });
+  return params;
+};
 
 /**
  * 查看外部的url地址是否以这几个开头
@@ -23,6 +36,24 @@ export const getUrlQuery = url => {
     if (param[1] && param[0]) params[param[0]] = param[1];
   });
   return params;
+};
+
+// 转化 md 语法为 html
+export const translateMarkdown = (plainText, isGuardXss = false) => {
+  return marked(isGuardXss ? xss(plainText) : plainText, {
+    renderer: new marked.Renderer(),
+    gfm: true,
+    pedantic: false,
+    sanitize: false,
+    tables: true,
+    breaks: true,
+    smartLists: true,
+    smartypants: true,
+    // highlight: function (code) {
+    //   /* eslint no-undef: "off" */
+    //   return hljs.highlightAuto(code).value;
+    // },
+  });
 };
 
 /**

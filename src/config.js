@@ -37,6 +37,6 @@ export const ABOUT = {
 // github授权信息
 export const GITHUB_AUTH = {
   enable: true, // github 第三方授权开关
-  client_id: 'c6a96a84105bb0be1fe5', // Setting > Developer setting > OAuth applications => client_id
+  client_id: 'e9c72a498f6ba0ae8528', // Setting > Developer setting > OAuth applications => client_id
   url: 'https://github.com/login/oauth/authorize', // 跳转的登录的地址
 };

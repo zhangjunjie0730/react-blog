@@ -19,7 +19,7 @@ function UserAvatar(props) {
             </>
           ) : null
         }
-        content={}
+        // content={}
       >
         <Button type="primary">Hover me</Button>
       </Popover>

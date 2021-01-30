@@ -1,7 +1,8 @@
 const Joi = require('joi');
 const fs = require('fs');
 const path = require('path');
-const { send } = require('koa-send');
+const send = require('koa-send');
+const archiver = require('archiver');
 const Sequelize = require('sequelize');
 const { or, not, like } = Sequelize.Op;
 const {
@@ -362,6 +363,67 @@ class ArticleController {
       ctx.attachment(decodeURI(fileName));
       await send(ctx, fileName, { root: outputPath });
     }
+  }
+
+  // 导出指定列表文章
+  static async outputList(ctx) {
+    const validator = ctx.validate(ctx.params, {
+      list: Joi.string().required(),
+    });
+    if (validator) {
+      const articleList = ctx.params.list.split(',');
+      const list = await ArticleModel.findAll({
+        where: { id: articleList },
+        include: [
+          { model: TagModel, attributes: ['name'] },
+          { model: CategoryModel, attributes: ['name'] },
+        ],
+      });
+
+      await Promise.all(list.map(article => getMdFileFromArticle));
+
+      const zipName = 'mdFiles.zip';
+      const zipSteam = fs.createWriteStream(path.join(outputPath, zipName));
+      const zip = archiver('zip');
+      zip.pipe(zipSteam);
+      list.forEach(item =>
+        zip.append(
+          fs.createReadStream(path.join(outputPath, `${item.title}.md`), {
+            name: `${item.title}.md`,
+          })
+        )
+      );
+      await zip.finalize();
+
+      ctx.attachment(decodeURI(zipName));
+      await send(ctx, zipName, { root: outputPath });
+    }
+  }
+
+  static async outputAll(ctx) {
+    const list = await ArticleModel.findAll({
+      where: { id: { [not]: -1 } },
+      include: [
+        { model: TagModel, attributes: ['name'] },
+        { model: CategoryModel, attributes: ['name'] },
+      ],
+    });
+    await Promise.all(list.map(article => getMdFileFromArticle(article)));
+
+    // 打包压缩 ...
+    const zipName = 'mdFiles.zip';
+    const zipStream = fs.createWriteStream(`${outputPath}/${zipName}`);
+    const zip = archiver('zip');
+    zip.pipe(zipStream);
+    list.forEach(item => {
+      zip.append(fs.createReadStream(`${outputPath}/${item.title}.md`), {
+        name: `${item.title}.md`, // 压缩文件名
+      });
+    });
+    await zip.finalize();
+
+    ctx.attachment(decodeURI(zipName));
+    await send(ctx, zipName, { root: outputPath });
   }
 }
 

@@ -5,7 +5,7 @@ const config = {
   PORT: 3002,
   GITHUB_INFO: {
     client_id: 'e9c72a498f6ba0ae8528',
-    client_secret: 'd9ec327e859f84971d45ee5fe00b398401ecf8ad',
+    client_secret: 'fab99776a768ea73bae7a2fce5c9655adf943e44',
     access_token_url: 'https://github.com/login/oauth/access_token',
     fetch_user_url: 'https://api.github.com/user', // 用于 oauth2
   },

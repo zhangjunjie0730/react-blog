@@ -3,7 +3,7 @@ const saltRounds = 10;
 const myPlaintextPassword = 'lal4$$ala';
 
 // 加密
-exports.encrypt = password => {
+const encrypt = password => {
   return new Promise((resolve, reject) => {
     bcrypt.genSalt(myPlaintextPassword, (err, salt) => {
       if (err) reject(password);
@@ -16,11 +16,16 @@ exports.encrypt = password => {
 };
 
 // 解密
-exports.comparePassword = (_password, hash) => {
+const comparePassword = (_password, hash) => {
   return new Promise((resolve, reject) => {
     bcrypt.compare(_password, hash, (err, isMatch) => {
       if (err) reject(err);
       else resolve(isMatch);
     });
   });
+};
+
+module.exporst = {
+  comparePassword,
+  encrypt,
 };

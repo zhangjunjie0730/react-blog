@@ -3,23 +3,29 @@ import { useSelector } from 'react-redux';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 
 import routes from 'routes';
+// 公共组件，挂载到 App 中：登录模态框和上传文件模态框
+import Public from 'components/Public';
 
-function App() {
-  const role = useSelector(state => state.user.role);
+const App = () => {
+  const role = useSelector(state => state.user.role); // 相当于 connect(state => state.user.role)(App)
 
+  // 解构 route
   function renderRoutes(routes, contextPath) {
     const children = [];
 
     const renderRoute = (item, routeContextPath) => {
       let newContextPath = item.path ? `${routeContextPath}/${item.path}` : routeContextPath;
       newContextPath = newContextPath.replace(/\/+/g, '/');
-      // 普通用户拒绝访问/admin
       if (newContextPath.includes('admin') && role !== 1) {
-        item = { ...item, component: () => <Redirect to="/" />, children: [] };
+        item = {
+          ...item,
+          component: () => <Redirect to="/" />,
+          children: [],
+        };
       }
       if (!item.component) return;
 
-      if (item.childrenRoutes) {
+      if (item.childRoutes) {
         const childRoutes = renderRoutes(item.childRoutes, newContextPath);
         children.push(
           <Route
@@ -35,13 +41,19 @@ function App() {
         );
       }
     };
+
     routes.forEach(item => renderRoute(item, contextPath));
+
     return <Switch>{children}</Switch>;
   }
 
   const children = renderRoutes(routes, '/');
-
-  return <BrowserRouter>{children}</BrowserRouter>;
-}
+  return (
+    <BrowserRouter>
+      {children}
+      <Public />
+    </BrowserRouter>
+  );
+};
 
 export default App;

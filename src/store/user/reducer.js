@@ -8,7 +8,9 @@ let defaultState = {
   github: null,
 };
 
-if (getLocalStorage('userInfo')) defaultState = { ...defaultState, ...getLocalStorage('userInfo') };
+if (getLocalStorage('userInfo')) {
+  defaultState = { ...defaultState, ...getLocalStorage('userInfo') };
+}
 
 export default function userReducer(state = defaultState, action) {
   const { type, payload } = action;
